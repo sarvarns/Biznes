@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>index</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MQTT.js for Real-Time Multi-Device Sync on GitHub Pages -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <!-- QRCode.js for High-Contrast Instant QR Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            background-image:
+                radial-gradient(circle at 12% 15%, rgba(16, 185, 129, 0.14) 0%, transparent 40%),
+                radial-gradient(circle at 88% 12%, rgba(245, 158, 11, 0.14) 0%, transparent 38%),
+                radial-gradient(circle at 50% 90%, rgba(99, 102, 241, 0.18) 0%, transparent 45%);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 24px 55px -12px rgba(0, 0, 0, 0.6);
+        }
+        .option-btn {
+            transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.2s ease;
+        }
+        .option-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeUp 0.28s ease-out forwards;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25%, 75% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+        }
+        .animate-shake {
+            animation: shake 0.35s ease-in-out;
+        }
+        @keyframes podiumGrow {
+            from { transform: scaleY(0.1); transform-origin: bottom; opacity: 0; }
+            to { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+        }
+        .podium-bar {
+            animation: podiumGrow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        #qrContainer img, #qrContainer canvas {
+            margin: 0 auto;
+            border-radius: 12px;
+        }
+        #confettiCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 90;
+        }
+    
+        .avbob{display:inline-block;animation:avbob 2s ease-in-out infinite}
+        @keyframes avbob{50%{transform:translateY(-5px) rotate(-6deg)}}
+        .avgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+        .avbtn{font-size:26px;padding:5px 0;border-radius:12px;background:#f1f5f9;border:3px solid transparent;transition:transform .15s}
+        .avbtn:hover{transform:scale(1.2) rotate(-6deg)}
+        .avbtn.sel{border-color:#f59e0b;background:#fef3c7;animation:avbob 1s infinite}
+        .fbub{position:fixed;bottom:-60px;z-index:0;pointer-events:none;opacity:.35;animation:fbrise linear infinite}
+        @keyframes fbrise{to{transform:translateY(-115vh) rotate(25deg)}}
+        </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- =================================================================== -->
+    <!-- TOP HEADER BAR                                                      -->
+    <!-- =================================================================== -->
+    <header class="w-full border-b border-white/10 bg-slate-950/85 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+            <!-- Brand -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/25 border border-amber-300/40">
+                    <span class="font-black text-lg sm:text-xl text-slate-950">SQ</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg sm:text-2xl font-black tracking-tight text-white">
+                            Sarvar<span class="text-amber-400">Quiz</span>
+                        </span>
+                        <span class="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                            Live Arena
+                        </span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-slate-400 font-medium">
+                        sarvarns.github.io/Quiz • Executive Edition
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right Status & Download -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Connection Status Pill -->
+                <div id="connPill" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                    <span>🟡 Ulanmoqda...</span>
+                </div>
+
+                <!-- Room PIN Badge (Host) -->
+                <div id="topRoomBadge" class="hidden px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-xs sm:text-sm font-extrabold text-amber-300 mono">
+                    PIN: <span id="topRoomCodeText">----</span>
+                </div>
+
+                <!-- Clean index.html Download Button -->
+                <button id="topDownloadBtn" onclick="window.downloadIndexHtml()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 transition">
+                    <span>📥</span>
+                    <span>index.html yuklab olish</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- =================================================================== -->
+    <!-- MAIN APPLICATION CONTAINER                                          -->
+    <!-- =================================================================== -->
+    <main class="flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 py-5 sm:py-7 flex flex-col justify-center">
+
+        <!-- =============================================================== -->
+        <!-- 1. HOME SCREEN (SARVARQUIZ DASHBOARD)                           -->
+        <!-- =============================================================== -->
+        <section id="homeScreen" class="hidden space-y-7 animate-fade-up">
+
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl overflow-hidden border border-white/15 shadow-2xl">
+                <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80"
+                     onerror="this.style.display='none'"
+                     alt="Corporate Boardroom"
+                     class="w-full h-56 sm:h-72 object-cover brightness-50" />
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-transparent"></div>
+
+                <div class="absolute inset-0 p-6 sm:p-10 flex flex-col justify-center max-w-2xl space-y-3">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-xs font-extrabold uppercase tracking-wider w-fit">
+                        💼 Universitet Amaliy Mashg‘uloti
+                    </span>
+                    <h1 class="text-3xl sm:text-5xl font-black text-white leading-tight">
+                        Sarvar<span class="text-amber-400">Quiz</span> — Jonli Bellashuv Platformasi
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Elektron doskada activityni oching, maxfiy parolni kiriting va kursdoshlar (30 tagacha) QR-kodni skanerlab bir vaqtda bellashishini boshlang.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Featured Activity Card -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                <!-- Business Meetings Card -->
+                <div onclick="window.openPasswordGate()"
+                     class="lg:col-span-8 group cursor-pointer bg-white text-slate-900 rounded-3xl overflow-hidden shadow-2xl border-2 border-transparent hover:border-amber-400 transition-all duration-300 flex flex-col sm:flex-row">
+                    <!-- Business Image -->
+                    <div class="sm:w-2/5 relative min-h-[210px] overflow-hidden bg-slate-900">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80"
+                             onerror="this.style.display='none'"
+                             alt="Business Meetings"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-transparent"></div>
+                        <div class="absolute top-3 left-3 px-3 py-1 rounded-xl bg-amber-400 text-slate-950 font-black text-xs uppercase">
+                            11-Mavzu
+                        </div>
+                        <div class="absolute bottom-3 left-3 text-white text-xs font-bold flex items-center gap-1.5">
+                            <span>🔒 Parol bilan himoyalangan</span>
+                        </div>
+                    </div>
+
+                    <!-- Card Content -->
+                    <div class="sm:w-3/5 p-6 sm:p-7 flex flex-col justify-between space-y-5">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">
+                                    30 ta savol • Jonli bellashuv
+                                </span>
+                                <span class="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-extrabold">
+                                    Tayyor
+                                </span>
+                            </div>
+                            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 group-hover:text-indigo-600 transition">
+                                Business Meetings
+                            </h2>
+                            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                Ishbilarmonlik uchrashuvlari, kun tartibi (Agenda), bayonnoma (Minutes) va rasmiy iboralar bo‘yicha 30 ta savoldan iborat tezkor bellashuv.
+                            </p>
+                        </div>
+
+                        <!-- Key Stats -->
+                        <div class="grid grid-cols-3 gap-2.5">
+                            <div class="p-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-center">
+                                <div class="text-[10px] font-bold uppercase text-slate-500">Savollar</div>
+                                <div class="mono-font text-sm sm:text-base font-black text-slate-900">30 ta</div>
+                            </div>
+                            <div class="p-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-center">
+                                <div class="text-[10px] font-bold uppercase text-slate-500">Tezlik Bali</div>
+                                <div class="mono-font text-sm sm:text-base font-black text-amber-600">100 → 10</div>
+                            </div>
+                            <div class="p-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-center">
+                                <div class="text-[10px] font-bold uppercase text-slate-500">Vaqt</div>
+                                <div class="mono-font text-sm sm:text-base font-black text-indigo-600">30 sek</div>
+                            </div>
+                        </div>
+
+                        <button class="w-full py-3.5 px-5 rounded-2xl bg-slate-900 group-hover:bg-indigo-600 text-white font-black text-sm sm:text-base shadow-lg flex items-center justify-center gap-2 transition">
+                            <span>🔑 Boshlovchi sifatida kirish</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Setup & Rules Card -->
+                <div class="lg:col-span-4 glass-panel rounded-3xl p-6 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="relative h-28 rounded-2xl overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=80"
+                                 onerror="this.style.display='none'"
+                                 alt="Meeting Discussion"
+                                 class="w-full h-full object-cover" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                            <div class="absolute bottom-2.5 left-3 font-extrabold text-sm text-white">
+                                📋 Qanday ishlaydi?
+                            </div>
+                        </div>
+
+                        <ul class="space-y-2.5 text-xs sm:text-sm text-slate-300">
+                            <li class="flex items-start gap-2">
+                                <span class="text-amber-400 font-black">1.</span>
+                                <span><b>Business Meetings</b> ustiga bosib boshlovchi parolini tering.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-emerald-400 font-black">2.</span>
+                                <span>Kursdoshlar ekrandagi <b>QR-kodni</b> skanerlab, ismini yozib kiradi.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-indigo-400 font-black">3.</span>
+                                <span>Har bir savolga <b>30 soniya</b> beriladi. Hamma belgilashi bilan avtomatik yakunlanadi!</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button onclick="window.downloadIndexHtml()" class="w-full py-3 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-300 font-bold text-xs flex items-center justify-center gap-2 transition">
+                        <span>📥</span>
+                        <span>GitHub uchun index.html yuklab olish</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PASSWORD MODAL (UNLOCKS ONLY WITH 1234)                         -->
+        <!-- =============================================================== -->
+        <div id="passwordModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+            <div id="passwordBox" class="glass-panel border border-amber-400/30 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-6 animate-fade-up">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-2xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-xl">
+                            🔐
+                        </div>
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-black text-white">Boshlovchi Paroli</h3>
+                            <p class="text-xs text-slate-400">Business Meetings • SarvarQuiz</p>
+                        </div>
+                    </div>
+                    <button onclick="window.closePasswordGate()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold">
+                        ✕
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-300 text-center">
+                        Maxfiy parolni kiriting
+                    </label>
+                    <input id="hostPassInput"
+                           type="password"
+                           inputmode="numeric"
+                           maxlength="8"
+                           placeholder="••••"
+                           onkeydown="if(event.key==='Enter') window.checkHostPassword()"
+                           class="w-full py-4 px-5 rounded-2xl bg-slate-950 border-2 border-slate-700 focus:border-amber-400 text-center mono-font text-3xl font-black text-amber-400 tracking-[0.5em] focus:outline-none transition" />
+                    <p id="hostPassError" class="hidden text-xs font-bold text-rose-400 text-center">
+                        ❌ Parol noto‘g‘ri! Qaytadan kiriting.
+                    </p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="window.closePasswordGate()" class="w-1/3 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm transition">
+                        Bekor qilish
+                    </button>
+                    <button onclick="window.checkHostPassword()" class="w-2/3 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-sm sm:text-base shadow-lg transition">
+                        Kirish →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- 2. HOST LOBBY (QR CODE + REAL-TIME 30 PARTICIPANTS)             -->
+        <!-- =============================================================== -->
+        <section id="hostLobbyScreen" class="hidden glass-panel rounded-3xl p-5 sm:p-8 animate-fade-up">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-center">
+
+                <!-- Left: QR Code & Join URL (5 Cols) -->
+                <div class="lg:col-span-5 bg-white text-slate-900 rounded-3xl p-6 flex flex-col items-center text-center space-y-4 shadow-2xl">
+                    <span class="px-3.5 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-extrabold uppercase tracking-wider">
+                        📱 Kamera orqali skanerlang
+                    </span>
+
+                    <!-- High-Contrast QR Container -->
+                    <div id="qrContainer" class="p-3 bg-white rounded-2xl border-4 border-slate-900 shadow-md flex items-center justify-center min-w-[230px] min-h-[230px]"></div>
+
+                    <!-- PIN Display -->
+                    <div class="w-full py-2.5 px-4 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-between">
+                        <span class="text-xs font-extrabold uppercase text-slate-500">Xona PIN:</span>
+                        <span id="lobbyRoomPin" class="mono-font text-2xl font-black text-slate-900 tracking-widest">----</span>
+                    </div>
+
+                    <!-- Join URL Display + Copy -->
+                    <div class="w-full space-y-2">
+                        <div id="lobbyJoinUrlText" class="text-[11px] mono-font text-slate-500 bg-slate-100 px-3 py-2 rounded-xl break-all border border-slate-200"></div>
+                        <div class="flex gap-2">
+                            <button onclick="window.copyStudentUrl()" id="copyUrlBtn" class="flex-1 py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition">
+                                🔗 Havolani nusxalash
+                            </button>
+                            <button onclick="window.addDemoBotPlayer()" class="py-2 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs font-extrabold transition" title="Darsdan oldin yakka holda tekshirish uchun">
+                                🤖 Demo test (1 bot)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Connected Classmates Grid & Start Button (7 Cols) -->
+                <div class="lg:col-span-7 flex flex-col justify-between h-full space-y-5">
+                    <!-- Banner -->
+                    <div class="relative h-28 sm:h-32 rounded-2xl overflow-hidden border border-white/10">
+                        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80"
+                             onerror="this.style.display='none'"
+                             alt="Corporate Conference"
+                             class="w-full h-full object-cover brightness-50" />
+                        <div class="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/50 to-transparent p-5 flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-400">SarvarQuiz • Kutish xonasi</span>
+                                <h2 class="text-2xl sm:text-3xl font-black text-white">Business Meetings</h2>
+                                <p class="text-xs text-slate-300">30 ta savol • 30 soniya • 100 ballik tizim</p>
+                            </div>
+                            <div class="px-4 py-2.5 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-center">
+                                <div class="text-[10px] font-bold uppercase text-emerald-300">Qatnashchilar</div>
+                                <div id="lobbyCountBadge" class="mono-font text-2xl sm:text-3xl font-black text-emerald-400">0 / 30</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Joined Badges Box -->
+                    <div class="bg-slate-950/75 border border-slate-800 rounded-2xl p-4 min-h-[220px] max-h-[270px] overflow-y-auto">
+                        <div id="lobbyEmptyPlaceholder" class="h-44 flex flex-col items-center justify-center text-center text-slate-400 space-y-2">
+                            <div class="text-3xl animate-bounce">📲</div>
+                            <p class="text-sm font-bold text-slate-200">Kursdoshlar QR-kodni skanerlab kirishini kuting...</p>
+                            <p class="text-xs text-slate-500">Kamida 1 kishi ulangach "Boshlash" tugmasi faollashadi</p>
+                        </div>
+                        <div id="lobbyPlayersList" class="hidden grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
+                    </div>
+
+                    <!-- Start Quiz Button (Enabled once >= 1 participant joins) -->
+                    <button id="hostStartBtn"
+                            disabled
+                            onclick="window.startLiveQuiz()"
+                            class="w-full py-4 sm:py-5 rounded-2xl bg-slate-800 text-slate-500 font-black text-lg sm:text-xl flex items-center justify-center gap-3 transition cursor-not-allowed">
+                        <span>⏳ Qatnashchilar ulanishini kuting (0 / 30)</span>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- 3. HOST LIVE QUESTION & ANONYMOUS DISTRIBUTION SCREEN           -->
+        <!-- =============================================================== -->
+        <section id="hostQuizScreen" class="hidden space-y-4 animate-fade-up">
+
+            <!-- Top Status Bar -->
+            <div class="glass-panel rounded-2xl p-3.5 sm:px-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-2.5">
+                    <div class="flex items-center gap-2.5">
+                        <span id="hostQCounter" class="px-3.5 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-black text-sm sm:text-base mono-font">
+                            1 / 30
+                        </span>
+                        <span class="text-xs sm:text-sm font-bold text-slate-300 hidden sm:inline">Business Meetings</span>
+                    </div>
+
+                    <!-- Live Speed Points (100 down to 10) -->
+                    <div class="px-3.5 py-1.5 rounded-xl bg-amber-500/15 border border-amber-400/40 flex items-center gap-2">
+                        <span class="text-xs font-bold text-amber-300">⚡ Joriy Ball:</span>
+                        <span id="hostLiveScoreMeter" class="mono-font text-base sm:text-xl font-black text-amber-400">100</span>
+                    </div>
+
+                    <!-- Answered Counter -->
+                    <div class="px-3.5 py-1.5 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center gap-2">
+                        <span class="text-xs font-bold text-indigo-300">Javob berdi:</span>
+                        <span id="hostAnsweredCounter" class="mono-font text-base sm:text-xl font-black text-white">0 / 0</span>
+                    </div>
+
+                    <!-- 30s Countdown -->
+                    <div class="px-4 py-1.5 rounded-xl bg-slate-900 border border-slate-700 flex items-center gap-2">
+                        <span>⏱️</span>
+                        <span id="hostTimerDisplay" class="mono-font text-lg sm:text-xl font-black text-emerald-400">30.0s</span>
+                    </div>
+                </div>
+
+                <!-- Timer Bar -->
+                <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden">
+                    <div id="hostTimerProgress" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-all duration-75" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Question Header with Corporate Photo -->
+            <div class="glass-panel rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch">
+                <div class="lg:col-span-4 relative min-h-[150px] sm:min-h-[190px] bg-slate-900">
+                    <img id="hostQBannerImg"
+                         src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80"
+                         onerror="this.style.display='none'"
+                         alt="Business Context"
+                         class="w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-3 px-3 py-1 rounded-lg bg-black/60 backdrop-blur-md text-[11px] font-bold text-amber-300">
+                        SarvarQuiz • Business Meetings
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 p-6 sm:p-8 flex items-center">
+                    <h2 id="hostQuestionText" class="text-xl sm:text-3xl lg:text-4xl font-black text-white leading-snug">
+                        Question loading...
+                    </h2>
+                </div>
+            </div>
+
+            <!-- 4 Answer Cards (With Anonymous Vote Chart after Question Completes) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+                <!-- Option A -->
+                <div id="hostCard0" class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-rose-600 to-pink-700 border-2 border-rose-400/50 shadow-xl flex flex-col justify-between gap-3 transition-all">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3.5">
+                            <span class="w-11 h-11 rounded-xl bg-black/30 border border-white/20 flex items-center justify-center font-black text-xl text-white shrink-0">A</span>
+                            <span id="hostOptLabel0" class="text-lg sm:text-2xl font-extrabold text-white"></span>
+                        </div>
+                        <span id="hostOptVote0" class="hidden px-3 py-1.5 rounded-xl bg-black/50 mono-font text-sm sm:text-base font-black text-white shrink-0">0 ta</span>
+                    </div>
+                    <div id="hostOptBarBox0" class="hidden w-full h-3 bg-black/35 rounded-full overflow-hidden">
+                        <div id="hostOptBarFill0" class="h-full bg-white rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div id="hostCard1" class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 border-2 border-blue-400/50 shadow-xl flex flex-col justify-between gap-3 transition-all">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3.5">
+                            <span class="w-11 h-11 rounded-xl bg-black/30 border border-white/20 flex items-center justify-center font-black text-xl text-white shrink-0">B</span>
+                            <span id="hostOptLabel1" class="text-lg sm:text-2xl font-extrabold text-white"></span>
+                        </div>
+                        <span id="hostOptVote1" class="hidden px-3 py-1.5 rounded-xl bg-black/50 mono-font text-sm sm:text-base font-black text-white shrink-0">0 ta</span>
+                    </div>
+                    <div id="hostOptBarBox1" class="hidden w-full h-3 bg-black/35 rounded-full overflow-hidden">
+                        <div id="hostOptBarFill1" class="h-full bg-white rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div id="hostCard2" class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 border-2 border-amber-300/50 shadow-xl flex flex-col justify-between gap-3 transition-all">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3.5">
+                            <span class="w-11 h-11 rounded-xl bg-black/30 border border-white/20 flex items-center justify-center font-black text-xl text-white shrink-0">C</span>
+                            <span id="hostOptLabel2" class="text-lg sm:text-2xl font-extrabold text-white"></span>
+                        </div>
+                        <span id="hostOptVote2" class="hidden px-3 py-1.5 rounded-xl bg-black/50 mono-font text-sm sm:text-base font-black text-white shrink-0">0 ta</span>
+                    </div>
+                    <div id="hostOptBarBox2" class="hidden w-full h-3 bg-black/35 rounded-full overflow-hidden">
+                        <div id="hostOptBarFill2" class="h-full bg-white rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Option D -->
+                <div id="hostCard3" class="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 border-2 border-emerald-400/50 shadow-xl flex flex-col justify-between gap-3 transition-all">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3.5">
+                            <span class="w-11 h-11 rounded-xl bg-black/30 border border-white/20 flex items-center justify-center font-black text-xl text-white shrink-0">D</span>
+                            <span id="hostOptLabel3" class="text-lg sm:text-2xl font-extrabold text-white"></span>
+                        </div>
+                        <span id="hostOptVote3" class="hidden px-3 py-1.5 rounded-xl bg-black/50 mono-font text-sm sm:text-base font-black text-white shrink-0">0 ta</span>
+                    </div>
+                    <div id="hostOptBarBox3" class="hidden w-full h-3 bg-black/35 rounded-full overflow-hidden">
+                        <div id="hostOptBarFill3" class="h-full bg-white rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inline Host Top-3 Leaderboard Card (Appears after Question Finishes) -->
+            <div id="hostPostQuestionPanel" class="hidden glass-panel border border-amber-400/30 rounded-3xl p-5 sm:p-6 space-y-4 animate-fade-up">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400">🏆 Top-3 Liderboard (Faqat Boshlovchida)</span>
+                        <p class="text-xs text-slate-400">Javoblar statistikasi 100% anonim ko‘rsatildi</p>
+                    </div>
+                    <button id="hostNextBtn" onclick="window.nextQuestionOrFinish()" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-sm sm:text-base shadow-xl transition">
+                        Keyingi savol ➡️
+                    </button>
+                </div>
+
+                <!-- Strictly Top 3 Players (1st, 2nd, 3rd) -->
+                <div id="inlineTop3Grid" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+            </div>
+
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- 4. FINAL TOP-3 PODIUM SCREEN (HOST ONLY AFTER QUESTION 30)      -->
+        <!-- =============================================================== -->
+        <section id="hostFinalPodiumScreen" class="hidden glass-panel border border-amber-400/30 rounded-3xl p-6 sm:p-10 text-center space-y-6 animate-fade-up">
+            <div class="space-y-2">
+                <span class="inline-block px-4 py-1 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-xs font-extrabold uppercase tracking-widest">
+                    🏆 SarvarQuiz • Yakuniy Natijalar
+                </span>
+                <h2 class="text-3xl sm:text-5xl font-black text-white">
+                    Top-3 G‘oliblar Shohsupasi
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-400">Business Meetings • 30 ta savol yakunlandi</p>
+            </div>
+
+            <!-- 3-Player Podium (2nd, 1st, 3rd) -->
+            <div id="finalPodiumGrid" class="grid grid-cols-3 gap-3 sm:gap-8 items-end max-w-3xl mx-auto pt-8 pb-2 min-h-[290px]"></div>
+
+            <div class="pt-4">
+                <button onclick="window.location.href = window.location.pathname" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-base shadow-xl transition">
+                    🔄 Bosh sahifaga qaytish
+                </button>
+            </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- 5. STUDENT / PARTICIPANT SMARTPHONE SCREEN (?join=ROOMID)       -->
+        <!-- =============================================================== -->
+        <section id="studentScreen" class="hidden max-w-md mx-auto w-full animate-fade-up">
+            <div class="bg-white text-slate-900 rounded-3xl p-5 shadow-2xl border border-slate-200 space-y-4">
+
+                <!-- Student Top Bar (Name & Personal Total Score Only) -->
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-slate-900 text-amber-400 font-black text-sm flex items-center justify-center">
+                            SQ
+                        </div>
+                        <div>
+                            <div id="stuNameBadge" class="font-extrabold text-slate-900 text-sm sm:text-base truncate max-w-[155px]">Ishtirokchi</div>
+                            <div id="stuRoomLabel" class="text-[11px] font-bold text-slate-500 mono-font">Business Meetings</div>
+                        </div>
+                    </div>
+
+                    <div class="px-3.5 py-1.5 rounded-xl bg-amber-100 border border-amber-300 text-right">
+                        <div class="text-[10px] font-extrabold uppercase text-amber-800">Shaxsiy Ball</div>
+                        <div id="stuScoreBadge" class="mono-font text-base font-black text-slate-900">0</div>
+                    </div>
+                </div>
+
+                <!-- 5A. Name Entry Card -->
+                <div id="stuJoinView" class="space-y-4">
+                    <div class="relative h-32 rounded-2xl overflow-hidden bg-slate-900">
+                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80"
+                             onerror="this.style.display='none'"
+                             alt="Business Meetings"
+                             class="w-full h-full object-cover brightness-50" />
+                        <div class="absolute inset-0 p-4 flex flex-col justify-end bg-gradient-to-t from-slate-950/90 to-transparent">
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-400">SarvarQuiz Live</span>
+                            <h3 class="text-xl font-black text-white">Business Meetings</h3>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-1.5">
+                            Ismingizni kiriting
+                        </label>
+                        <input id="stuNameField"
+                               type="text"
+                               maxlength="22"
+                               placeholder="Masalan: Jasur"
+                               onkeydown="if(event.key==='Enter') window.joinAsStudent()"
+                               class="w-full px-4 py-3.5 rounded-2xl bg-slate-100 border-2 border-slate-300 focus:border-indigo-600 text-slate-900 font-bold text-base focus:outline-none transition" />
+                    </div>
+
+                    <p id="stuJoinError" class="hidden text-xs font-bold text-rose-600 text-center"></p>
+
+                    <button onclick="window.joinAsStudent()"
+                            class="w-full py-4 rounded-2xl bg-slate-900 hover:bg-indigo-600 text-white font-black text-base shadow-lg transition">
+                        🚀 O‘yinga qo‘shilish
+                    </button>
+                </div>
+
+                <!-- 5B. Waiting Lobby View -->
+                <div id="stuWaitView" class="hidden text-center py-10 space-y-3">
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-100 border-2 border-emerald-400 text-emerald-700 mx-auto flex items-center justify-center text-3xl font-black">
+                        ✓
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900">Muvaffaqiyatli qo‘shildingiz!</h3>
+                    <p class="text-xs text-slate-500 max-w-xs mx-auto">
+                        Ismingiz elektron doskada chiqdi. Boshlovchi o‘yinni boshlashini kuting...
+                    </p>
+                </div>
+
+                <!-- 5C. Live Question & 4 Option Buttons View -->
+                <div id="stuPlayView" class="hidden space-y-3.5">
+                    <div class="flex items-center justify-between text-xs font-extrabold">
+                        <span id="stuQNum" class="px-2.5 py-1 rounded-lg bg-slate-900 text-amber-400 mono-font">1 / 30</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 mono-font">
+                            ⚡ <span id="stuLivePts">100</span> ball
+                        </span>
+                        <span id="stuTimer" class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-900 mono-font">30.0s</span>
+                    </div>
+
+                    <!-- Full Question Text right on the Student's Phone -->
+                    <div class="p-4 rounded-2xl bg-slate-900 text-white text-center shadow-inner">
+                        <p id="stuQuestionPrompt" class="text-sm sm:text-base font-extrabold leading-snug"></p>
+                    </div>
+
+                    <!-- 4 Interactive Options -->
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <button onclick="window.submitStudentChoice(0)" class="option-btn p-3.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white flex items-center gap-3 text-left shadow-md">
+                            <span class="w-9 h-9 rounded-xl bg-black/25 font-black text-base flex items-center justify-center shrink-0">A</span>
+                            <span id="stuOpt0" class="font-extrabold text-sm sm:text-base"></span>
+                        </button>
+
+                        <button onclick="window.submitStudentChoice(1)" class="option-btn p-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-3 text-left shadow-md">
+                            <span class="w-9 h-9 rounded-xl bg-black/25 font-black text-base flex items-center justify-center shrink-0">B</span>
+                            <span id="stuOpt1" class="font-extrabold text-sm sm:text-base"></span>
+                        </button>
+
+                        <button onclick="window.submitStudentChoice(2)" class="option-btn p-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-3 text-left shadow-md">
+                            <span class="w-9 h-9 rounded-xl bg-black/15 font-black text-base flex items-center justify-center shrink-0">C</span>
+                            <span id="stuOpt2" class="font-extrabold text-sm sm:text-base"></span>
+                        </button>
+
+                        <button onclick="window.submitStudentChoice(3)" class="option-btn p-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-3 text-left shadow-md">
+                            <span class="w-9 h-9 rounded-xl bg-black/25 font-black text-base flex items-center justify-center shrink-0">D</span>
+                            <span id="stuOpt3" class="font-extrabold text-sm sm:text-base"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5D. Answer Locked View -->
+                <div id="stuLockedView" class="hidden text-center py-10 space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-700 mx-auto flex items-center justify-center text-2xl animate-pulse font-black">
+                        ⚡
+                    </div>
+                    <h4 class="text-lg font-black text-slate-900">Javobingiz yuborildi!</h4>
+                    <p class="text-xs text-slate-500">Barcha kursdoshlar belgilashini kuting...</p>
+                </div>
+
+                <!-- 5E. Personal Result View (NO Leaderboard on Phone) -->
+                <div id="stuResultView" class="hidden text-center py-8 space-y-3">
+                    <div id="stuResIcon" class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl font-black">
+                        ✓
+                    </div>
+                    <h4 id="stuResTitle" class="text-xl font-black text-slate-900">TO‘G‘RI!</h4>
+                    <p id="stuResPts" class="mono-font text-lg font-extrabold text-emerald-600">+0 ball</p>
+                    <p id="stuResCorrectText" class="text-xs font-bold text-slate-600 pt-1"></p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- CORE APPLICATION SCRIPT                                             -->
+    <!-- =================================================================== -->
+    <script>
+        // -------------------------------------------------------------------
+        // 1. ALL 30 BUSINESS MEETINGS QUESTIONS (IN EXACT ORDER, NO LABELS)
+        // -------------------------------------------------------------------
+        const QUESTIONS = [
+            { id: 1, q: "Who leads a business meeting?", options: ["Customer", "Cashier", "Chairperson", "Driver"], correct: 2 },
+            { id: 2, q: "What is a list of topics for a meeting called?", options: ["Receipt", "Agenda", "Invoice", "Resume"], correct: 1 },
+            { id: 3, q: "What does \"AOB\" stand for on an agenda?", options: ["All Office Budgets", "Annual Open Board", "After Office Break", "Any Other Business"], correct: 3 },
+            { id: 4, q: "What does \"to cancel a meeting\" mean?", options: ["Not hold it", "Start early", "Invite more people", "Change rooms"], correct: 0 },
+            { id: 5, q: "What are the official written notes of a meeting?", options: ["Seconds", "Hours", "Minutes", "Days"], correct: 2 },
+            { id: 6, q: "Which verb means \"to officially close a meeting\"?", options: ["Promote", "Adjourn", "Recruit", "Resign"], correct: 1 },
+            { id: 7, q: "People who join a meeting are called:", options: ["Competitors", "Tourists", "Guards", "Participants"], correct: 3 },
+            { id: 8, q: "\"To postpone a meeting\" means to hold it:", options: ["Later", "Yesterday", "Never", "Secretly"], correct: 0 },
+            { id: 9, q: "What is a \"unanimous decision\"?", options: ["Rejected by all", "Made by one boss", "Agreed by everyone", "Delayed for a week"], correct: 2 },
+            { id: 10, q: "Which app is used for online business meetings?", options: ["Netflix", "Zoom", "Spotify", "CapCut"], correct: 1 },
+            { id: 11, q: "Which meeting is held to generate new ideas?", options: ["Brainstorming", "Firing", "Auditing", "Bookkeeping"], correct: 0 },
+            { id: 12, q: "What does \"AGM\" stand for in business?", options: ["Active Group Manager", "Average Gross Margin", "All Global Markets", "Annual General Meeting"], correct: 3 },
+            { id: 13, q: "Which phrase is used to open a meeting?", options: ["See you tomorrow", "Thank you for coming", "Meeting is closed", "Have a nice weekend"], correct: 1 },
+            { id: 14, q: "What does \"Let's get down to business\" mean?", options: ["Take a coffee break", "Leave the building", "Start the main work", "Close the company"], correct: 2 },
+            { id: 15, q: "What is \"consensus\" in a business meeting?", options: ["General agreement", "Financial loss", "A strict penalty", "Personal conflict"], correct: 0 },
+            { id: 16, q: "Where do in-person meetings usually take place?", options: ["Warehouse", "Parking lot", "Elevator", "Conference room"], correct: 3 },
+            { id: 17, q: "Who writes the \"minutes\" during a meeting?", options: ["Security guard", "Note-taker / Secretary", "Delivery driver", "Cleaner"], correct: 1 },
+            { id: 18, q: "What are \"action points\" at the end of a meeting?", options: ["Salary bonuses", "Company holidays", "Tasks assigned to people", "Office rules"], correct: 2 },
+            { id: 19, q: "How do you politely ask for someone's opinion?", options: ["What do you think?", "Be quiet!", "You are wrong!", "Don't speak!"], correct: 0 },
+            { id: 20, q: "Which phrase is a polite way to disagree?", options: ["That's stupid", "Never say that", "You know nothing", "I see your point, but..."], correct: 3 },
+            { id: 21, q: "What does \"to hand over to someone\" mean?", options: ["Fire an employee", "Give them the turn to speak", "Cancel their speech", "Cut their salary"], correct: 1 },
+            { id: 22, q: "What should you do with your phone in a meeting?", options: ["Play games", "Call a friend", "Put it on silent", "Watch videos"], correct: 2 },
+            { id: 23, q: "What is a \"kick-off meeting\"?", options: ["First meeting of a project", "The final meeting", "A football match", "A job interview"], correct: 0 },
+            { id: 24, q: "What does \"to bring a meeting forward\" mean?", options: ["Hold it next month", "Cancel it forever", "Make it longer", "Hold it earlier than planned"], correct: 3 },
+            { id: 25, q: "What is a \"one-on-one\" meeting?", options: ["Meeting of 100 people", "Meeting between two people", "Public conference", "TV show"], correct: 1 },
+            { id: 26, q: "What does \"Let's wrap up\" mean in a meeting?", options: ["Let's argue", "Let's start", "Let's finish", "Let's eat"], correct: 2 },
+            { id: 27, q: "What is a \"quorum\" in a formal meeting?", options: ["Minimum members needed to vote", "Maximum time allowed", "The room temperature", "The annual budget"], correct: 0 },
+            { id: 28, q: "If you cannot attend a meeting, you should:", options: ["Say nothing", "Hide at home", "Turn off your phone", "Inform in advance"], correct: 3 },
+            { id: 29, q: "What does \"getting side-tracked\" mean?", options: ["Finishing early", "Going off-topic", "Signing a contract", "Making a profit"], correct: 1 },
+            { id: 30, q: "What does \"to reach a deadlock\" mean in a meeting?", options: ["Everyone agrees quickly", "The meeting ends early", "Neither side compromises", "Profits double"], correct: 2 }
+        ];
+
+        const QUESTION_BANNERS = [
+            "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80",
+            "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1200&q=80"
+        ];
+
+        // -------------------------------------------------------------------
+        // 2. STATE & CONFIGURATION
+        // -------------------------------------------------------------------
+        const AVATARS = ["🚗","🏎️","🚓","🚕","🚙","🚌","🛵","🚀","🦁","🐯","🐼","🦊","🐸","🐵","🦄","🐧","🐶","🐱","🐲","🦉","🌸","🌻","🌹","🌷","🌼","🪻"];
+        let studentAvatar = sessionStorage.getItem("sq_av") || "🦁";
+        const HOST_SECRET_CODE = "1234";
+        const QUESTION_DURATION = 30; // 30 seconds
+        const MAX_PLAYERS = 30;
+
+        let mode = "home"; // 'home' | 'host' | 'student'
+        let roomId = "";
+        let timerHandle = null;
+
+        let gameState = {
+            roomId: "",
+            phase: "lobby", // 'lobby' | 'question' | 'reveal' | 'finished'
+            qIndex: 0,
+            qStartTime: 0,
+            duration: QUESTION_DURATION
+        };
+
+        // players[id] = { id, name, score, lastQ, lastChoice, lastEarned, isBot }
+        let players = {};
+
+        // Student Identity
+        let studentId = sessionStorage.getItem("sq_pid") || ("p_" + Math.random().toString(36).substring(2, 10));
+        sessionStorage.setItem("sq_pid", studentId);
+        let studentName = sessionStorage.getItem("sq_pname") || "";
+
+        // -------------------------------------------------------------------
+        // 3. SPEED SCORING FORMULA (100 DOWN TO 10 OVER 30 SECONDS)
+        // -------------------------------------------------------------------
+        function calcSpeedScore(elapsedSec) {
+            return Math.max(10, Math.round(100 - (elapsedSec / 30) * 90));
+        }
+
+        // -------------------------------------------------------------------
+        // 4. REAL-TIME MQTT SYNC ENGINE (WITH FALLBACK & BROADCASTCHANNEL)
+        // -------------------------------------------------------------------
+        let mqttClient = null;
+        const bc = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("sarvarquiz_sync") : null;
+
+        function setConnPill(ready) {
+            const pill = document.getElementById("connPill");
+            if (ready) {
+                pill.className = "px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-400/40 text-xs font-bold text-emerald-300 flex items-center gap-1.5";
+                pill.innerHTML = "<span>🟢 Tarmoq tayyor</span>";
+            } else {
+                pill.className = "px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-400/40 text-xs font-bold text-amber-300 flex items-center gap-1.5";
+                pill.innerHTML = "<span>🟡 Ulanmoqda...</span>";
+            }
+        }
+
+        function initRealtimeSync(targetRoomId) {
+            const topicState = `sarvarquiz/${targetRoomId}/state`;
+            const topicJoin = `sarvarquiz/${targetRoomId}/join`;
+            const topicAnswer = `sarvarquiz/${targetRoomId}/answer`;
+            const topicReq = `sarvarquiz/${targetRoomId}/req`;
+
+            if (bc) {
+                bc.onmessage = (ev) => {
+                    if (ev.data && ev.data.roomId === targetRoomId) {
+                        handleSyncEvent(ev.data.topic, ev.data.payload);
+                    }
+                };
+            }
+
+            if (typeof mqtt !== "undefined") {
+                const brokers = [
+                    "wss://broker.emqx.io:8084/mqtt",
+                    "wss://broker.hivemq.com:8884/mqtt"
+                ];
+                let idx = 0;
+
+                function connectBroker() {
+                    const url = brokers[idx % brokers.length];
+                    if (mqttClient) {
+                        try { mqttClient.end(true); } catch (e) {}
+                    }
+                    mqttClient = mqtt.connect(url, {
+                        clientId: "sq_" + Math.random().toString(16).substring(2, 10),
+                        clean: true,
+                        connectTimeout: 5000,
+                        reconnectPeriod: 2000
+                    });
+
+                    mqttClient.on("connect", () => {
+                        setConnPill(true);
+                        mqttClient.subscribe([topicState, topicJoin, topicAnswer, topicReq], { qos: 0 }, () => {
+                            if (mode === "student") {
+                                sendSyncMsg(topicReq, { studentId });
+                            }
+                        });
+                    });
+
+                    mqttClient.on("message", (topic, message) => {
+                        try {
+                            const data = JSON.parse(message.toString());
+                            handleSyncEvent(topic, data);
+                        } catch (e) {}
+                    });
+
+                    mqttClient.on("error", () => {
+                        setConnPill(false);
+                        idx++;
+                    });
+
+                    mqttClient.on("close", () => {
+                        setConnPill(false);
+                    });
+                }
+
+                connectBroker();
+            }
+        }
+
+        function sendSyncMsg(topic, payload) {
+            if (bc) {
+                try { bc.postMessage({ roomId, topic, payload }); } catch (e) {}
+            }
+            if (mqttClient && mqttClient.connected) {
+                try { mqttClient.publish(topic, JSON.stringify(payload), { qos: 0 }); } catch (e) {}
+            }
+        }
+
+        function broadcastHostGameState() {
+            sendSyncMsg(`sarvarquiz/${roomId}/state`, {
+                gameState,
+                players
+            });
+        }
+
+        function handleSyncEvent(topic, data) {
+            if (!data) return;
+
+            if (topic.endsWith("/state") && mode === "student") {
+                gameState = { ...gameState, ...data.gameState };
+                if (data.players) {
+                    players = { ...players, ...data.players };
+                }
+                updateStudentUI();
+            } else if (topic.endsWith("/join") && mode === "host") {
+                const p = data.player;
+                if (!p) return;
+                if (!players[p.id] && Object.keys(players).length >= MAX_PLAYERS) return;
+                players[p.id] = players[p.id] ? { ...players[p.id], name: p.name, avatar: p.avatar } : p;
+                if (gameState.phase === "lobby") {
+                    renderHostLobby();
+                } else {
+                    checkHostAnswersAndAutoComplete();
+                }
+                broadcastHostGameState();
+            } else if (topic.endsWith("/answer") && mode === "host") {
+                const { id, qIndex, choice, earned } = data;
+                if (players[id] && qIndex === gameState.qIndex && players[id].lastQ !== qIndex) {
+                    players[id].lastQ = qIndex;
+                    players[id].lastChoice = choice;
+                    players[id].lastEarned = earned;
+                    players[id].score = (players[id].score || 0) + earned;
+                    checkHostAnswersAndAutoComplete();
+                    broadcastHostGameState();
+                }
+            } else if (topic.endsWith("/req") && mode === "host") {
+                broadcastHostGameState();
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // 5. DOWNLOAD CLEAN `index.html` FOR GITHUB PAGES
+        // -------------------------------------------------------------------
+        window.downloadIndexHtml = function () {
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "index.html";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        // -------------------------------------------------------------------
+        // 6. HOST PASSWORD GATE (`1234`) & LOBBY SETUP
+        // -------------------------------------------------------------------
+        window.openPasswordGate = function () {
+            document.getElementById("hostPassError").classList.add("hidden");
+            const inp = document.getElementById("hostPassInput");
+            inp.value = "";
+            document.getElementById("passwordModal").classList.remove("hidden");
+            setTimeout(() => inp.focus(), 60);
+        };
+
+        window.closePasswordGate = function () {
+            document.getElementById("passwordModal").classList.add("hidden");
+        };
+
+        window.checkHostPassword = function () {
+            const val = document.getElementById("hostPassInput").value.trim();
+            if (val === HOST_SECRET_CODE) {
+                window.closePasswordGate();
+                enterHostLobby();
+            } else {
+                const err = document.getElementById("hostPassError");
+                const box = document.getElementById("passwordBox");
+                err.classList.remove("hidden");
+                box.classList.remove("animate-shake");
+                void box.offsetWidth;
+                box.classList.add("animate-shake");
+            }
+        };
+
+        function enterHostLobby() {
+            mode = "host";
+            roomId = String(Math.floor(1000 + Math.random() * 9000));
+            players = {};
+
+            document.getElementById("homeScreen").classList.add("hidden");
+            document.getElementById("topDownloadBtn").classList.add("hidden");
+            document.getElementById("topRoomBadge").classList.remove("hidden");
+            document.getElementById("topRoomCodeText").textContent = roomId;
+            document.getElementById("lobbyRoomPin").textContent = roomId;
+            document.getElementById("hostLobbyScreen").classList.remove("hidden");
+
+            const baseUrl = window.location.href.split("?")[0].split("#")[0];
+            const joinUrl = `${baseUrl}?join=${roomId}`;
+            document.getElementById("lobbyJoinUrlText").textContent = joinUrl;
+
+            // Generate crisp QR Code using QRCode.js
+            const qrBox = document.getElementById("qrContainer");
+            qrBox.innerHTML = "";
+            new QRCode(qrBox, {
+                text: joinUrl,
+                width: 220,
+                height: 220,
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            gameState = {
+                roomId,
+                phase: "lobby",
+                qIndex: 0,
+                qStartTime: Date.now(),
+                duration: QUESTION_DURATION
+            };
+
+            initRealtimeSync(roomId);
+            renderHostLobby();
+        }
+
+        function renderHostLobby() {
+            const list = Object.values(players);
+            document.getElementById("lobbyCountBadge").textContent = `${list.length} / ${MAX_PLAYERS}`;
+
+            const empty = document.getElementById("lobbyEmptyPlaceholder");
+            const grid = document.getElementById("lobbyPlayersList");
+            const startBtn = document.getElementById("hostStartBtn");
+
+            if (list.length === 0) {
+                empty.classList.remove("hidden");
+                grid.classList.add("hidden");
+                startBtn.disabled = true;
+                startBtn.className = "w-full py-4 sm:py-5 rounded-2xl bg-slate-800 text-slate-500 font-black text-lg sm:text-xl flex items-center justify-center gap-3 transition cursor-not-allowed";
+                startBtn.innerHTML = `<span>⏳ Qatnashchilar ulanishini kuting (0 / 30)</span>`;
+            } else {
+                empty.classList.add("hidden");
+                grid.classList.remove("hidden");
+                grid.innerHTML = list.map((p, i) => `
+                    <div class="px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 flex items-center gap-2.5 animate-fade-up">
+                        <span class="w-6 h-6 rounded-lg bg-amber-400 text-slate-950 font-black text-xs flex items-center justify-center shrink-0">
+                            ${i + 1}
+                        </span>
+                        <span class="text-2xl avbob">${p.avatar || "🙂"}</span><span class="font-bold text-white text-sm truncate">${escapeHtml(p.name)}</span>
+                    </div>
+                `).join("");
+
+                startBtn.disabled = false;
+                startBtn.className = "w-full py-4 sm:py-5 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-300 hover:to-teal-400 text-slate-950 font-black text-lg sm:text-xl shadow-2xl shadow-emerald-500/25 flex items-center justify-center gap-3 transition cursor-pointer";
+                startBtn.innerHTML = `<span>🚀 Boshlash (${list.length} kishi tayyor)</span>`;
+            }
+        }
+
+        window.copyStudentUrl = function () {
+            const urlText = document.getElementById("lobbyJoinUrlText").textContent;
+            const ta = document.createElement("textarea");
+            ta.value = urlText;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            const btn = document.getElementById("copyUrlBtn");
+            btn.textContent = "✓ Nusxalandi!";
+            setTimeout(() => { btn.textContent = "🔗 Havolani nusxalash"; }, 2000);
+        };
+
+        window.addDemoBotPlayer = function () {
+            if (Object.keys(players).length >= MAX_PLAYERS) return;
+            const botNum = Object.keys(players).length + 1;
+            const botId = "bot_" + botNum;
+            players[botId] = {
+                id: botId,
+                name: `Demo Talaba #${botNum}`,
+                score: 0,
+                lastQ: -1,
+                lastChoice: -1,
+                lastEarned: 0,
+                isBot: true
+            };
+            renderHostLobby();
+            broadcastHostGameState();
+        };
+
+        // -------------------------------------------------------------------
+        // 7. HOST GAMEPLAY (30s TIMER + EARLY AUTO-COMPLETE WHEN ALL ANSWER)
+        // -------------------------------------------------------------------
+        window.startLiveQuiz = function () {
+            if (Object.keys(players).length === 0) return;
+            document.getElementById("hostLobbyScreen").classList.add("hidden");
+            document.getElementById("hostQuizScreen").classList.remove("hidden");
+            launchHostQuestion(0);
+        };
+
+        function launchHostQuestion(index) {
+            if (timerHandle) clearInterval(timerHandle);
+
+            gameState = {
+                roomId,
+                phase: "question",
+                qIndex: index,
+                qStartTime: Date.now(),
+                duration: QUESTION_DURATION
+            };
+
+            // Simulate demo bots answering if any demo bots were added
+            Object.values(players).forEach(p => {
+                if (p.isBot) {
+                    const delay = 1500 + Math.random() * 2500;
+                    setTimeout(() => {
+                        if (gameState.phase === "question" && gameState.qIndex === index && p.lastQ !== index) {
+                            const qObj = QUESTIONS[index];
+                            const choice = Math.random() < 0.7 ? qObj.correct : Math.floor(Math.random() * 4);
+                            const elapsed = (Date.now() - gameState.qStartTime) / 1000;
+                            const earned = choice === qObj.correct ? calcSpeedScore(elapsed) : 0;
+                            p.lastQ = index;
+                            p.lastChoice = choice;
+                            p.lastEarned = earned;
+                            p.score = (p.score || 0) + earned;
+                            checkHostAnswersAndAutoComplete();
+                            broadcastHostGameState();
+                        }
+                    }, delay);
+                }
+            });
+
+            broadcastHostGameState();
+            renderHostQuestionUI();
+        }
+
+        function renderHostQuestionUI() {
+            const idx = gameState.qIndex;
+            const qObj = QUESTIONS[idx];
+
+            document.getElementById("hostQCounter").textContent = `${idx + 1} / ${QUESTIONS.length}`;
+            document.getElementById("hostQBannerImg").src = QUESTION_BANNERS[idx % QUESTION_BANNERS.length];
+            document.getElementById("hostQuestionText").textContent = `${qObj.id}. ${qObj.q}`;
+            document.getElementById("hostPostQuestionPanel").classList.add("hidden");
+
+            const baseGradients = [
+                "from-rose-600 to-pink-700 border-rose-400/50",
+                "from-blue-600 to-indigo-700 border-blue-400/50",
+                "from-amber-500 to-orange-600 border-amber-300/50",
+                "from-emerald-600 to-teal-700 border-emerald-400/50"
+            ];
+
+            for (let i = 0; i < 4; i++) {
+                document.getElementById("hostOptLabel" + i).textContent = qObj.options[i];
+                const card = document.getElementById("hostCard" + i);
+                card.className = `p-5 sm:p-6 rounded-2xl bg-gradient-to-br ${baseGradients[i]} border-2 shadow-xl flex flex-col justify-between gap-3 transition-all`;
+                document.getElementById("hostOptVote" + i).classList.add("hidden");
+                document.getElementById("hostOptBarBox" + i).classList.add("hidden");
+            }
+
+            checkHostAnswersAndAutoComplete();
+
+            if (timerHandle) clearInterval(timerHandle);
+            timerHandle = setInterval(() => {
+                const elapsed = (Date.now() - gameState.qStartTime) / 1000;
+                const rem = Math.max(0, QUESTION_DURATION - elapsed);
+                const livePts = calcSpeedScore(elapsed);
+
+                document.getElementById("hostTimerDisplay").textContent = `${rem.toFixed(1)}s`;
+                document.getElementById("hostTimerProgress").style.width = `${(rem / QUESTION_DURATION) * 100}%`;
+                document.getElementById("hostLiveScoreMeter").textContent = livePts;
+
+                if (rem <= 0 && gameState.phase === "question") {
+                    finishCurrentQuestion();
+                }
+            }, 80);
+        }
+
+        function checkHostAnswersAndAutoComplete() {
+            const allPlayers = Object.values(players);
+            const totalConnected = allPlayers.length;
+            const answeredCount = allPlayers.filter(p => p.lastQ === gameState.qIndex).length;
+
+            document.getElementById("hostAnsweredCounter").textContent = `${answeredCount} / ${totalConnected}`;
+
+            // CRITICAL AUTO-ADVANCE RULE: Immediately stop timer and reveal stats once everyone answers
+            if (gameState.phase === "question" && totalConnected > 0 && answeredCount >= totalConnected) {
+                finishCurrentQuestion();
+            }
+        }
+
+        function finishCurrentQuestion() {
+            if (timerHandle) clearInterval(timerHandle);
+            if (gameState.phase === "reveal") return;
+
+            gameState.phase = "reveal";
+            broadcastHostGameState();
+
+            const idx = gameState.qIndex;
+            const qObj = QUESTIONS[idx];
+            const allPlayers = Object.values(players);
+
+            // Anonymous vote counts for A, B, C, D
+            const counts = [0, 0, 0, 0];
+            let totalVotes = 0;
+            allPlayers.forEach(p => {
+                if (p.lastQ === idx && p.lastChoice >= 0 && p.lastChoice <= 3) {
+                    counts[p.lastChoice]++;
+                    totalVotes++;
+                }
+            });
+
+            for (let i = 0; i < 4; i++) {
+                const card = document.getElementById("hostCard" + i);
+                const voteBadge = document.getElementById("hostOptVote" + i);
+                const barBox = document.getElementById("hostOptBarBox" + i);
+                const barFill = document.getElementById("hostOptBarFill" + i);
+
+                const pct = totalVotes > 0 ? Math.round((counts[i] / totalVotes) * 100) : 0;
+                voteBadge.textContent = i === qObj.correct
+                    ? `✓ ${counts[i]} ta (${pct}%)`
+                    : `${counts[i]} ta (${pct}%)`;
+                voteBadge.classList.remove("hidden");
+                barBox.classList.remove("hidden");
+                barFill.style.width = `${pct}%`;
+
+                if (i === qObj.correct) {
+                    card.className = "p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 border-4 border-white shadow-2xl flex flex-col justify-between gap-3 scale-[1.01] transition-all";
+                } else {
+                    card.className = "p-5 sm:p-6 rounded-2xl bg-slate-900/85 border border-slate-800 opacity-60 flex flex-col justify-between gap-3 transition-all";
+                }
+            }
+
+            // Render Top-3 Leaderboard strictly on Host screen
+            renderInlineTop3();
+            const nextBtn = document.getElementById("hostNextBtn");
+            nextBtn.textContent = idx < QUESTIONS.length - 1 ? "Keyingi savol ➡️" : "🏆 Yakuniy Top-3 Shohsupa";
+            document.getElementById("hostPostQuestionPanel").classList.remove("hidden");
+        }
+
+        function renderInlineTop3() {
+            const top3 = Object.values(players)
+                .sort((a, b) => (b.score || 0) - (a.score || 0))
+                .slice(0, 3);
+
+            const medals = ["🥇 1-o‘rin", "🥈 2-o‘rin", "🥉 3-o‘rin"];
+            const accents = [
+                "bg-amber-400/15 border-amber-400/50 text-amber-300",
+                "bg-slate-300/10 border-slate-400/40 text-slate-200",
+                "bg-orange-500/15 border-orange-400/40 text-orange-300"
+            ];
+
+            document.getElementById("inlineTop3Grid").innerHTML = top3.map((p, i) => `
+                <div class="p-3.5 rounded-2xl border ${accents[i]} flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="text-xs font-black uppercase shrink-0">${medals[i]}</span>
+                        <span class="text-2xl avbob">${p.avatar || "🙂"}</span><span class="font-extrabold text-white text-sm truncate">${escapeHtml(p.name)}</span>
+                    </div>
+                    <span class="mono-font font-black text-amber-400 text-sm sm:text-base shrink-0">${p.score || 0}</span>
+                </div>
+            `).join("");
+        }
+
+        window.nextQuestionOrFinish = function () {
+            if (gameState.qIndex < QUESTIONS.length - 1) {
+                launchHostQuestion(gameState.qIndex + 1);
+            } else {
+                showFinalTop3Podium();
+            }
+        };
+
+        function showFinalTop3Podium() {
+            if (timerHandle) clearInterval(timerHandle);
+            gameState.phase = "finished";
+            broadcastHostGameState();
+
+            document.getElementById("hostQuizScreen").classList.add("hidden");
+            document.getElementById("hostFinalPodiumScreen").classList.remove("hidden");
+            launchConfetti();
+
+            const top3 = Object.values(players)
+                .sort((a, b) => (b.score || 0) - (a.score || 0))
+                .slice(0, 3);
+
+            // Display order: 2nd (left), 1st (center), 3rd (right)
+            const order = [top3[1], top3[0], top3[2]];
+            const styles = [
+                { badge: "🥈 2-O‘rin", h: "h-40 sm:h-48", bg: "from-slate-300 to-slate-500" },
+                { badge: "👑 1-O‘rin", h: "h-52 sm:h-64", bg: "from-amber-300 via-yellow-400 to-amber-500" },
+                { badge: "🥉 3-O‘rin", h: "h-32 sm:h-40", bg: "from-orange-400 to-amber-700" }
+            ];
+
+            document.getElementById("finalPodiumGrid").innerHTML = order.map((p, idx) => {
+                const st = styles[idx];
+                if (!p) {
+                    return `
+                        <div class="flex flex-col items-center justify-end opacity-25">
+                            <div class="w-full ${st.h} rounded-t-3xl bg-slate-800 border border-slate-700 p-3 flex items-start justify-center">
+                                <span class="text-xs font-bold text-slate-400">${st.badge}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="flex flex-col items-center justify-end">
+                        <div class="mb-2.5 text-center">
+                            <div class="text-5xl sm:text-6xl avbob">${p.avatar || "🙂"}</div><div class="font-black text-white text-base sm:text-xl truncate max-w-[110px] sm:max-w-[180px]">${escapeHtml(p.name)}</div>
+                            <div class="mono-font text-sm sm:text-lg font-black text-amber-400">${p.score || 0} ball</div>
+                        </div>
+                        <div class="podium-bar w-full ${st.h} rounded-t-3xl bg-gradient-to-b ${st.bg} p-4 flex items-start justify-center shadow-2xl">
+                            <span class="px-3 py-1 rounded-full bg-black/30 text-white font-black text-xs sm:text-sm">${st.badge}</span>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        // -------------------------------------------------------------------
+        // 8. STUDENT SMARTPHONE VIEW (?join=ROOMID — LOCKED OUT OF HOST MODE)
+        // -------------------------------------------------------------------
+        function enterStudentMode(joinedRoomId) {
+            mode = "student";
+            roomId = joinedRoomId;
+
+            // Lock out Host & Home elements completely
+            document.getElementById("homeScreen").classList.add("hidden");
+            document.getElementById("hostLobbyScreen").classList.add("hidden");
+            document.getElementById("hostQuizScreen").classList.add("hidden");
+            document.getElementById("hostFinalPodiumScreen").classList.add("hidden");
+            document.getElementById("topDownloadBtn").classList.add("hidden");
+
+            document.getElementById("studentScreen").classList.remove("hidden");
+            document.getElementById("stuRoomLabel").textContent = `Xona: ${roomId} • Business Meetings`;
+
+            if (studentName) {
+                document.getElementById("stuNameField").value = studentName;
+            }
+
+            initRealtimeSync(roomId);
+        }
+
+        window.joinAsStudent = function () {
+            const rawName = document.getElementById("stuNameField").value.trim();
+            const errEl = document.getElementById("stuJoinError");
+
+            if (!rawName) {
+                errEl.textContent = "Iltimos, ismingizni kiriting!";
+                errEl.classList.remove("hidden");
+                return;
+            }
+            errEl.classList.add("hidden");
+
+            studentName = rawName;
+            sessionStorage.setItem("sq_pname", studentName);
+            document.getElementById("stuNameBadge").textContent = studentAvatar + " " + studentName;
+
+            const playerObj = players[studentId] ? { ...players[studentId], name: studentName, avatar: studentAvatar } : {
+                avatar: studentAvatar,
+                id: studentId,
+                name: studentName,
+                score: 0,
+                lastQ: -1,
+                lastChoice: -1,
+                lastEarned: 0
+            };
+
+            players[studentId] = playerObj;
+            sendSyncMsg(`sarvarquiz/${roomId}/join`, { player: playerObj });
+            updateStudentUI();
+        };
+
+        window.submitStudentChoice = function (choiceIdx) {
+            const me = players[studentId];
+            if (!me || gameState.phase !== "question" || me.lastQ === gameState.qIndex) return;
+
+            const idx = gameState.qIndex;
+            const qObj = QUESTIONS[idx];
+            const elapsed = Math.max(0, Math.min(QUESTION_DURATION, (Date.now() - gameState.qStartTime) / 1000));
+            const isCorrect = choiceIdx === qObj.correct;
+            const earned = isCorrect ? calcSpeedScore(elapsed) : 0;
+
+            me.lastQ = idx;
+            me.lastChoice = choiceIdx;
+            me.lastEarned = earned;
+            me.score = (me.score || 0) + earned;
+            players[studentId] = me;
+
+            sendSyncMsg(`sarvarquiz/${roomId}/answer`, {
+                id: studentId,
+                qIndex: idx,
+                choice: choiceIdx,
+                earned
+            });
+
+            updateStudentUI();
+        };
+
+        function updateStudentUI() {
+            const me = players[studentId];
+            if (!me) return;
+
+            document.getElementById("stuJoinView").classList.add("hidden");
+            document.getElementById("stuWaitView").classList.add("hidden");
+            document.getElementById("stuPlayView").classList.add("hidden");
+            document.getElementById("stuLockedView").classList.add("hidden");
+            document.getElementById("stuResultView").classList.add("hidden");
+
+            document.getElementById("stuScoreBadge").textContent = me.score || 0;
+
+            if (gameState.phase === "lobby") {
+                document.getElementById("stuWaitView").classList.remove("hidden");
+                return;
+            }
+
+            const idx = gameState.qIndex;
+            const qObj = QUESTIONS[idx];
+
+            if (gameState.phase === "question") {
+                if (me.lastQ === idx) {
+                    if (timerHandle) clearInterval(timerHandle);
+                    document.getElementById("stuLockedView").classList.remove("hidden");
+                } else {
+                    document.getElementById("stuPlayView").classList.remove("hidden");
+                    document.getElementById("stuQNum").textContent = `${idx + 1} / ${QUESTIONS.length}`;
+                    document.getElementById("stuQuestionPrompt").textContent = `${qObj.id}. ${qObj.q}`;
+                    for (let i = 0; i < 4; i++) {
+                        document.getElementById("stuOpt" + i).textContent = qObj.options[i];
+                    }
+
+                    if (timerHandle) clearInterval(timerHandle);
+                    timerHandle = setInterval(() => {
+                        const elapsed = (Date.now() - gameState.qStartTime) / 1000;
+                        const rem = Math.max(0, QUESTION_DURATION - elapsed);
+                        document.getElementById("stuTimer").textContent = `${rem.toFixed(1)}s`;
+                        document.getElementById("stuLivePts").textContent = calcSpeedScore(elapsed);
+                    }, 100);
+                }
+            } else if (gameState.phase === "reveal" || gameState.phase === "finished") {
+                if (timerHandle) clearInterval(timerHandle);
+                document.getElementById("stuResultView").classList.remove("hidden");
+
+                const answered = me.lastQ === idx;
+                const right = answered && me.lastChoice === qObj.correct;
+                const letters = ["A", "B", "C", "D"];
+
+                const icon = document.getElementById("stuResIcon");
+                const title = document.getElementById("stuResTitle");
+                const pts = document.getElementById("stuResPts");
+                const corr = document.getElementById("stuResCorrectText");
+
+                corr.textContent = `To‘g‘ri javob: ${letters[qObj.correct]}) ${qObj.options[qObj.correct]}`;
+
+                if (right) {
+                    icon.className = "w-16 h-16 rounded-2xl bg-emerald-100 border-2 border-emerald-500 text-emerald-700 mx-auto flex items-center justify-center text-3xl font-black";
+                    icon.textContent = "✓";
+                    title.textContent = "TO‘G‘RI JAVOB!";
+                    pts.className = "mono-font text-lg font-extrabold text-emerald-600";
+                    pts.textContent = `+${me.lastEarned} ball`;
+                } else {
+                    icon.className = "w-16 h-16 rounded-2xl bg-rose-100 border-2 border-rose-500 text-rose-700 mx-auto flex items-center justify-center text-3xl font-black";
+                    icon.textContent = "✕";
+                    title.textContent = answered ? "XATO JAVOB" : "VAQT TUGADI";
+                    pts.className = "mono-font text-lg font-extrabold text-rose-600";
+                    pts.textContent = "+0 ball";
+                }
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // 9. HELPERS & CONFETTI
+        // -------------------------------------------------------------------
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, s => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            }[s]));
+        }
+
+        function launchConfetti() {
+            const canvas = document.getElementById("confettiCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const pieces = Array.from({ length: 85 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * -canvas.height,
+                size: Math.random() * 9 + 5,
+                color: ["#fbbf24", "#10b981", "#6366f1", "#f43f5e"][Math.floor(Math.random() * 4)],
+                vy: Math.random() * 4 + 2.5,
+                vx: (Math.random() - 0.5) * 3,
+                rot: Math.random() * 360
+            }));
+
+            let ticks = 0;
+            function frame() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                pieces.forEach(p => {
+                    p.y += p.vy;
+                    p.x += p.vx;
+                    p.rot += 4;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rot * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+                ticks++;
+                if (ticks < 140) requestAnimationFrame(frame);
+                else ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            frame();
+        }
+
+        // -------------------------------------------------------------------
+        // 10. INITIAL ROUTE HANDLER
+        // -------------------------------------------------------------------
+        window.addEventListener("DOMContentLoaded", () => {
+            const params = new URLSearchParams(window.location.search);
+            const joinRoom = params.get("join");
+
+            if (joinRoom) {
+                enterStudentMode(joinRoom.trim());
+            } else {
+                document.getElementById("homeScreen").classList.remove("hidden");
+            }
+        });
+    
+        // ---- Avatar picker + floating emojis ----
+        (function () {
+            const f = document.getElementById("stuNameField");
+            if (f) {
+                const box = document.createElement("div");
+                box.innerHTML = '<div class="text-xs font-extrabold uppercase text-slate-500 mb-2">Avatar tanlang</div><div class="avgrid mb-3">' +
+                    AVATARS.map(a => '<button type="button" class="avbtn' + (a === studentAvatar ? ' sel' : '') + '">' + a + '</button>').join("") + '</div>';
+                f.parentNode.insertBefore(box, f);
+                box.querySelectorAll(".avbtn").forEach(b => b.onclick = () => {
+                    studentAvatar = b.textContent;
+                    sessionStorage.setItem("sq_av", studentAvatar);
+                    box.querySelectorAll(".avbtn").forEach(x => x.classList.remove("sel"));
+                    b.classList.add("sel");
+                });
+            }
+            ["💼","📈","🤝","🏢","📊","💡","🗓️","📝","☕","🎯","💬","⭐","🚗","🌻"].forEach((e, i) => {
+                const d = document.createElement("div");
+                d.className = "fbub"; d.textContent = e;
+                d.style.cssText = `left:${i * 7}%;font-size:${22 + i % 4 * 8}px;animation-duration:${14 + i % 5 * 4}s;animation-delay:${-i * 2.3}s`;
+                document.body.appendChild(d);
+            });
+        })();
+    </script>
+</body>
+</html>
